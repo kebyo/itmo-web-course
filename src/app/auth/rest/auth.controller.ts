@@ -5,6 +5,7 @@ import {
   HttpCode,
   Patch,
   Post,
+  Res,
 } from '@nestjs/common';
 import {
   ApiOkResponse,
@@ -12,6 +13,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Response } from 'express';
 
 import { UserService } from '../../user/database/user.service';
 import { AuthCommonService } from '../common/authCommon.service';
@@ -46,7 +48,7 @@ export class AuthController {
   // })
   // @HttpCode(200)
   @Post('login')
-  async login(@Body() body: LoginDto): Promise<AuthResponseDto> {
+  async login(@Body() body: LoginDto, @Res({passthrough: true}) res: Response): Promise<AuthResponseDto> {
     const { email, password } = body;
 
     const user = await this.userService.checkUserCredentials(
@@ -54,7 +56,11 @@ export class AuthController {
       password,
     );
 
-    return this.authCommonService.generateResponse(user);
+
+    const authResponse = await this.authCommonService.generateResponse(user);
+    res.cookie('token', authResponse.accessToken);
+
+    return authResponse;
   }
 
   // /**

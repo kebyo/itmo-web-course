@@ -6,6 +6,7 @@ import { join } from 'path';
 
 import { AppModule } from './app/app.module';
 import { appHost, appPort } from './config/environment';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -13,6 +14,7 @@ async function bootstrap() {
   });
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.use(cookieParser());
 
 
   // Активируем рендеринг ejs шаблонов
@@ -23,4 +25,5 @@ async function bootstrap() {
 }
 
 bootstrap().catch((e) => console.error(`Uncaught error`, e));
+
 

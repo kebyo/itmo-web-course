@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title><%=title %></title>
+</head>
+<body>
+    <header>
+        <button onclick="toMainPage()">Главная</button>
+        <button onclick="showCreatePromocodeInput()">Добавить промокод</button>
+        <button onclick="showAuthInput()">Войти</button>
+    </header>
+
+    <main>
+        <div id="auth">
+            <form id="auth" name="pomocode_create_input">
+                <p>Название продукта</p>
+                <input name="productName">
+                <p>Ссылка на продуке</p>
+                <input name="productUrl">
+
+                <p>Описание скидки</p>
+                <input name="description">
+                <p>Размер скидки</p>
+                <input name="saleSize">
+
+                <p>Код</p>
+                <input name="code">
+
+                <input type="button" value="Создать" onclick="createPromocode()">
+            </form>
+        </div>
+        <div>
+            <form id="pomocode_create_input" name="pomocode_create_input">
+                <p>Название продукта</p>
+                <input name="productName">
+                <p>Ссылка на продуке</p>
+                <input name="productUrl">
+
+                <p>Описание скидки</p>
+                <input name="description">
+                <p>Размер скидки</p>
+                <input name="saleSize">
+
+                <p>Код</p>
+                <input name="code">
+
+                <input type="button" value="Создать" onclick="createPromocode()">
+            </form>
+        </div>
+        <h1> Промокоды: </h1>
+        <% if (promocodes && promocodes.length) {%>
+            <% for (var i = 0; i < promocodes.length; i++) { %>
+                <% const promocode = promocodes[i]; %>
+                <h2>Продукт</h2>
+                <h3> Название </h3>
+                <p> <%= promocode.productName %> </p>
+                <h3> Ссылка </h3>
+                <p> <%= promocode.productUrl %> </p>
+
+                <h2> Скидка </h2>
+                <h3> Описание </h3>
+                <p> <%= promocode.description %> </p>
+                <h3> Размер </h3>
+                <p> <%= promocode.saleSize %> </p>
+            <%}%>
+        <%}%>
+    </main>
+
+    <footer>
+
+    </footer>
+
+    <script>
+        function toMainPage() {
+            fetch('http://localhost:5000');
+        }
+
+        async function createPromocode() {
+            const productName = document.pomocode_create_input.productName.value;
+            const productUrl = document.pomocode_create_input.productUrl.value;
+            const saleSize = document.pomocode_create_input.saleSize.value;
+            const description = document.pomocode_create_input.description.value;
+            console.log({
+                productName,
+                productUrl,
+                saleSize,
+                description
+            },)
+
+            await fetch('http://localhost:5000/promocodes', {
+                method: 'POST',
+                body: {
+                    productName,
+                    productUrl,
+                    saleSize,
+                    description
+                },
+            }).catch(e => {
+                console.log(e);
+                if (e.code === 401) {
+                    console.log('Unauthorized');
+                }
+            });
+        }
+
+        function showAuthInput() {
+
+        }
+
+        function login() {
+
+        }
+
+    </script>
+</body>
+</html>

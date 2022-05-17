@@ -8,7 +8,7 @@ import {User} from '../../user/database/user.entity';
 import {applyChanges} from '../../../utils/object';
 import {JwtAuthGuard} from '../../auth/common/jwt-auth.guard';
 
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 @Controller('promocodes')
 export class PromocodeController {
 	constructor(

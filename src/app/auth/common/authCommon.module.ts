@@ -14,7 +14,7 @@ import {UserDatabaseModule} from '../../user/database/user.database-module';
  */
 @Module({
   imports: [
-    PassportModule.register({ defaultStrategy: STRATEGY_JWT }),
+    PassportModule.register({ defaultStrategy: STRATEGY_JWT, session: false, }),
     JwtModule.register({
       secret: jwtSecretKey,
       signOptions: {
