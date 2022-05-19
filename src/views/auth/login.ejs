@@ -5,23 +5,39 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.14.1/dist/css/uikit.min.css" />
+
+    <!-- UIkit JS -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.14.1/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.14.1/dist/js/uikit-icons.min.js"></script>
+    <title>Вход</title>
 </head>
 <body>
-    <form action="/login" method="post">
-        <div class="form-group">
-            <label>Email</label>
-            <input type="text" class="form-control" name="email">
-        </div>
-        <div class="form-group">
-            <label>Password</label>
-            <input type="password" class="form-control" name="password">
+    <main>
+        <div class="uk-card uk-card-default uk-card-body uk-width-1@m uk-width-1-3 uk-position-center" uk-scrollspy="cls: uk-animation-slide-bottom; target: .uk-card; delay: 300; repeat: true">
+            <form action="http://localhost:5000/auth/login" method="post">
+                <fieldset class="uk-fieldset">
+                    <legend class="uk-legend">Вход</legend>
+
+                    <div class="uk-margin">
+                        <input class="uk-input" type="text" name="email" placeholder="Email">
+                    </div>
+
+                    <div class="uk-margin">
+                        <input class="uk-input" type="text" name="password" placeholder="Пароль">
+                    </div>
+
+                    <button type="submit" class="uk-button uk-button-default">Войти</button>
+                </fieldset>
+            </form>
         </div>
 
-        <button type="submit" class="btn btn-warning btn-lg">Login</button>
-    </form>
+        <div class="uk-position-bottom-center">
+            <p>Нет аккунта? <a href="http://localhost:5000/auth/signup">Зарегестрируйся!</a></p>
+            <p>Или вернись на <a href="http://localhost:5000">главную</a></p>
+        </div>
+    </main>
 
-    <p>Need an account? <a href="/signup">Signup</a></p>
-    <p>Or go <a href="/">home</a>.</p>
 </body>
 </html>

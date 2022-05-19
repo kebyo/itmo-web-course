@@ -5,80 +5,56 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title><%=title %></title>
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.14.1/dist/css/uikit.min.css" />
+
+    <!-- UIkit JS -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.14.1/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.14.1/dist/js/uikit-icons.min.js"></script>
+    <title>Главная</title>
 </head>
 <body>
     <header>
-        <button onclick="toMainPage()">Главная</button>
-        <button onclick="showCreatePromocodeInput()">Добавить промокод</button>
-        <button onclick="showAuthInput()">Войти</button>
+        <nav class="uk-navbar-container" uk-navbar style="margin-bottom: 10px">
+            <div class="uk-navbar-left">
+                <ul class="uk-navbar-nav">
+                    <li class="uk-active"><a href="http://localhost:5000">Главная</a></li>
+                    <% if (!isAuth) { %>
+                        <li class="uk-active"><a href="http://localhost:5000/auth/login">Вход</a></li>
+                        <li class="uk-active"><a href="http://localhost:5000/auth/signup">Регистрация</a></li>
+                    <% } %>
+                    <li class="uk-activate"><a href="http://localhost:5000/promocodes/create" class="uk-icon-link" uk-icon="plus-circle"></a></li>
+                </ul>
+            </div>
+            <div class="uk-navbar-right">
+                <ul class="uk-navbar-nav">
+                    <li class="uk-activate"><a href="http://localhost:5000/auth/login" class="uk-icon-link" uk-icon="user"></a></li>
+                </ul>
+            </div>
+        </nav>
     </header>
 
     <main>
-        <div id="auth">
-            <form id="auth" name="pomocode_create_input">
-                <p>Название продукта</p>
-                <input name="productName">
-                <p>Ссылка на продуке</p>
-                <input name="productUrl">
-
-                <p>Описание скидки</p>
-                <input name="description">
-                <p>Размер скидки</p>
-                <input name="saleSize">
-
-                <p>Код</p>
-                <input name="code">
-
-                <input type="button" value="Создать" onclick="createPromocode()">
-            </form>
-        </div>
-        <div>
-            <form id="pomocode_create_input" name="pomocode_create_input">
-                <p>Название продукта</p>
-                <input name="productName">
-                <p>Ссылка на продуке</p>
-                <input name="productUrl">
-
-                <p>Описание скидки</p>
-                <input name="description">
-                <p>Размер скидки</p>
-                <input name="saleSize">
-
-                <p>Код</p>
-                <input name="code">
-
-                <input type="button" value="Создать" onclick="createPromocode()">
-            </form>
-        </div>
-        <h1> Промокоды: </h1>
-        <% if (promocodes && promocodes.length) {%>
-            <% for (var i = 0; i < promocodes.length; i++) { %>
-                <% const promocode = promocodes[i]; %>
-                <h2>Продукт</h2>
-                <h3> Название </h3>
-                <p> <%= promocode.productName %> </p>
-                <h3> Ссылка </h3>
-                <p> <%= promocode.productUrl %> </p>
-
-                <h2> Скидка </h2>
-                <h3> Описание </h3>
-                <p> <%= promocode.description %> </p>
-                <h3> Размер </h3>
-                <p> <%= promocode.saleSize %> </p>
+        <div class="uk-text-center uk-child-width-1-2@s uk-child-width-1-5@m" uk-grid>
+            <% if (promocodes && promocodes.length) { %>
+                <% for (var i = 0; i < promocodes.length; i++) { %>
+                    <% const promocode = promocodes[i]; %>
+                    <div>
+                        <div class="uk-card uk-card-default uk-card-body uk-card-hover">
+                            <h3 class="uk-card-title"><%= promocode.productName %></h3>
+                            <p><%= promocode.description %></p>
+                            <p><%= `${promocode.saleSize}%` %></p>
+                            <a href="<%= promocode.productUrl %>"> <%= promocode.productUrl %> </a>
+                            <h4><%= promocode.code %></h4>
+                        </div>
+                    </div>
+                <%}%>
             <%}%>
-        <%}%>
+        </div>
+
     </main>
 
-    <footer>
-
-    </footer>
-
     <script>
-        function toMainPage() {
-            fetch('http://localhost:5000');
-        }
-
         async function createPromocode() {
             const productName = document.pomocode_create_input.productName.value;
             const productUrl = document.pomocode_create_input.productUrl.value;
