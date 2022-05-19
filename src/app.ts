@@ -16,7 +16,6 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.use(cookieParser());
 
-
   // Активируем рендеринг ejs шаблонов
   app.setBaseViewsDir([join(process.cwd(), 'src/views')]);
   app.setViewEngine('ejs');
@@ -25,5 +24,3 @@ async function bootstrap() {
 }
 
 bootstrap().catch((e) => console.error(`Uncaught error`, e));
-
-

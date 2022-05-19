@@ -1,7 +1,7 @@
 /**
  * Подставляет в обработчик запроса текущего пользователя из HTTP-контекста
  */
-import {createParamDecorator, ExecutionContext} from '@nestjs/common';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 export const CurrentUser = createParamDecorator(
 	(data, context: ExecutionContext) => {
