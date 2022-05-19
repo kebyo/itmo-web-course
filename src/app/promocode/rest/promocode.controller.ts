@@ -1,66 +1,101 @@
-import {Body, Controller, Delete, ForbiddenException, Get, Param, Patch, Post, Render, UseGuards} from '@nestjs/common';
-import {InjectRepository} from '@nestjs/typeorm';
-import {Promocode} from '../database/promocode.entity';
-import {Repository} from 'typeorm';
-import {PromocodeCreateDto, PromocodeDeleteDto, PromocodeUpdate} from './promocode.dtos';
-import {CurrentUser} from '../../auth/common/currentUser.decorator';
-import {User} from '../../user/database/user.entity';
-import {applyChanges} from '../../../utils/object';
-import {JwtAuthGuard} from '../../auth/common/jwt-auth.guard';
+import {
+  Body,
+  Controller,
+  Delete,
+  ForbiddenException,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Render,
+  UseGuards,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Promocode } from '../database/promocode.entity';
+import { Repository } from 'typeorm';
+import {
+  PromocodeCreateDto,
+  PromocodeDeleteDto,
+  PromocodeUpdate,
+} from './promocode.dtos';
+import { CurrentUser } from '../../auth/common/currentUser.decorator';
+import { User } from '../../user/database/user.entity';
+import { applyChanges } from '../../../utils/object';
+import { JwtAuthGuard } from '../../auth/common/jwt-auth.guard';
 
-// @UseGuards(JwtAuthGuard)
 @Controller('promocodes')
 export class PromocodeController {
-	constructor(
-		@InjectRepository(Promocode)
-		private readonly promocodeRepo: Repository<Promocode>,
-	) {}
+  constructor(
+    @InjectRepository(Promocode)
+    private readonly promocodeRepo: Repository<Promocode>,
+  ) {}
 
-	@Get()
-	async getAll() {
-		return this.promocodeRepo.find();
-	}
+  @Get()
+  @Render('mainPage')
+  async getAll(@CurrentUser() user: User) {
+    const promocodes = await this.promocodeRepo.find();
 
-	@Get(':id')
-	async getById(@Param('id') id: number) {
-		return this.promocodeRepo.findOneOrFail(id);
-	}
+    return {
+      promocodes,
+      isAuth: !!user,
+    };
+  }
 
-	@Post()
-	async create(@Body() body: PromocodeCreateDto, @CurrentUser() user: User): Promise<Promocode> {
-		const promocode = this.promocodeRepo.create({
-			ownerId: user.id,
-			...body
-		});
+  // @Get(':id')
+  // async getById(@Param('id') id: number) {
+  //   return this.promocodeRepo.findOneOrFail(id);
+  // }
 
-		return this.promocodeRepo.save(promocode);
-	}
+  @Get('create')
+  @Render('promocode/create')
+  async createPage() {
+    return {
+      isAuth: true,
+    };
+  }
 
-	@Delete('/:id')
-	async delete(@Param('id') id: number, @CurrentUser() user: User): Promise<PromocodeDeleteDto> {
-		const promocode = await this.promocodeRepo.findOneOrFail(id);
+  // @UseGuards(JwtAuthGuard)
+  @Post()
+  async create(
+    @Body() body: PromocodeCreateDto,
+    @CurrentUser() user: User,
+  ): Promise<Promocode> {
+    const promocode = this.promocodeRepo.create({
+      ownerId: 1,
+      ...body,
+    });
 
-		if (promocode.ownerId !== user.id) {
-			throw new ForbiddenException('Это промокод не принадлежит вам');
-		}
+    return this.promocodeRepo.save(promocode);
+  }
 
-		const res = await this.promocodeRepo.delete(promocode.id);
+  @Delete('/:id')
+  async delete(
+    @Param('id') id: number,
+    @CurrentUser() user: User,
+  ): Promise<PromocodeDeleteDto> {
+    const promocode = await this.promocodeRepo.findOneOrFail(id);
 
-		return {
-			success: !!res.affected,
-		}
-	}
+    if (promocode.ownerId !== user.id) {
+      throw new ForbiddenException('Это промокод не принадлежит вам');
+    }
 
-	@Patch('/:id')
-	async update(
-		@Param('id') id: number,
-		@Body() body: PromocodeUpdate,
-		@CurrentUser() user: User
-	): Promise<Promocode> {
-		const promocode = await this.promocodeRepo.findOneOrFail(id);
+    const res = await this.promocodeRepo.delete(promocode.id);
 
-		applyChanges(promocode, body);
+    return {
+      success: !!res.affected,
+    };
+  }
 
-		return this.promocodeRepo.save(promocode);
-	}
+  @Patch('/:id')
+  async update(
+    @Param('id') id: number,
+    @Body() body: PromocodeUpdate,
+    @CurrentUser() user: User,
+  ): Promise<Promocode> {
+    const promocode = await this.promocodeRepo.findOneOrFail(id);
+
+    applyChanges(promocode, body);
+
+    return this.promocodeRepo.save(promocode);
+  }
 }

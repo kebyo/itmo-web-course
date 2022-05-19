@@ -6,6 +6,8 @@ import {
   Patch,
   Post,
   Res,
+  Get,
+  Render,
 } from '@nestjs/common';
 import {
   ApiOkResponse,
@@ -21,7 +23,7 @@ import { UserTokensService } from '../database/userTokens.service';
 import { AuthResponseDto } from '../dtos/auth-response.dto';
 import { ForbiddenResponseDto } from '../dtos/forbidden-response.dto';
 import { RefreshTokenDto } from '../dtos/refresh-token.dto';
-import {LoginDto, SignUpDto} from './auth.dtos';
+import { LoginDto, SignUpDto } from './auth.dtos';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -32,30 +34,28 @@ export class AuthController {
     private readonly authCommonService: AuthCommonService,
   ) {}
 
+  @Get('login')
+  @Render('auth/login')
+  async loginPage() {
+    return;
+  }
+
+  @Get('signup')
+  @Render('auth/signup')
+  async signupPage() {
+    return;
+  }
   /**
    * Выполняет аутентификацию с использованием email/phone и пароля
    */
-  // @ApiOperation({
-  //   summary: 'Login into application',
-  // })
-  // @ApiOkResponse({
-  //   description: 'Login into application',
-  //   type: AuthResponseDto,
-  // })
-  // @ApiResponse({
-  //   status: 401,
-  //   type: ForbiddenResponseDto,
-  // })
-  // @HttpCode(200)
   @Post('login')
-  async login(@Body() body: LoginDto, @Res({passthrough: true}) res: Response): Promise<AuthResponseDto> {
+  async login(
+    @Body() body: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<AuthResponseDto> {
     const { email, password } = body;
 
-    const user = await this.userService.checkUserCredentials(
-      email,
-      password,
-    );
-
+    const user = await this.userService.checkUserCredentials(email, password);
 
     const authResponse = await this.authCommonService.generateResponse(user);
     res.cookie('token', authResponse.accessToken);
@@ -85,7 +85,9 @@ export class AuthController {
     const potentialUser = await this.userService.getByEmail(email);
 
     if (potentialUser) {
-      throw new BadRequestException('User with this email or phone already exists');
+      throw new BadRequestException(
+        'User with this email or phone already exists',
+      );
     }
 
     const user = await this.userService.createUser(body);
