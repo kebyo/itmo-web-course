@@ -41,6 +41,7 @@
                     <% const promocode = promocodes[i]; %>
                     <div>
                         <div class="uk-card uk-card-default uk-card-body uk-card-hover">
+                            <a href="http://localhost:5000/promocodes/update/1" class="uk-icon-link uk-position-right uk-padding-small" uk-icon="pencil"></a>
                             <h3 class="uk-card-title"><%= promocode.productName %></h3>
                             <p><%= promocode.description %></p>
                             <p><%= `${promocode.saleSize}%` %></p>

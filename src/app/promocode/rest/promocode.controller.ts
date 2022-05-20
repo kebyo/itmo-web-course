@@ -41,6 +41,16 @@ export class PromocodeController {
     };
   }
 
+  @Get('update/:id')
+  @Render('promocode/update')
+  async updatePage(@Param('id') id: number) {
+    const promocode = await this.promocodeRepo.findOneOrFail(id);
+
+    return {
+      promocode,
+    };
+  }
+
   // @Get(':id')
   // async getById(@Param('id') id: number) {
   //   return this.promocodeRepo.findOneOrFail(id);

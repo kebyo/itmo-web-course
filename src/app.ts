@@ -7,6 +7,7 @@ import { join } from 'path';
 import { AppModule } from './app/app.module';
 import { appHost, appPort } from './config/environment';
 import * as cookieParser from 'cookie-parser';
+import session from 'express-session';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -15,6 +16,13 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.use(cookieParser());
+  app.use(
+    session({
+      secret: 'my-secret',
+      resave: false,
+      saveUninitialized: false,
+    }),
+  );
 
   // Активируем рендеринг ejs шаблонов
   app.setBaseViewsDir([join(process.cwd(), 'src/views')]);

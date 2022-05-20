@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import {TypeOrmModule} from '@nestjs/typeorm';
-import {Promocode} from './promocode.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Promocode } from './promocode.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Promocode])],
