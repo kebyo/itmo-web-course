@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.14.1/dist/css/uikit.min.css" />
+
+    <!-- UIkit JS -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.14.1/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.14.1/dist/js/uikit-icons.min.js"></script>
+    <title>Аккаунт</title>
+</head>
+<body>
+<header>
+    <nav class="uk-navbar-container" uk-navbar style="margin-bottom: 10px">
+        <div class="uk-navbar-left">
+            <ul class="uk-navbar-nav">
+                <li class="uk-active"><a href="http://localhost:5000">Главная</a></li>
+                <li class="uk-activate"><a href="http://localhost:5000/promocodes/create" class="uk-icon-link" uk-icon="plus-circle"></a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+<main>
+    <div class="uk-card uk-card-default uk-card-body uk-width-1@m uk-width-2-1" uk-scrollspy="cls: uk-animation-slide-bottom; target: .uk-card; delay: 300; repeat: true">
+    <form name="updateUserForm">
+        <fieldset class="uk-fieldset">
+            <legend class="uk-legend">Редактирование аккаунта</legend>
+
+            <div class="uk-margin">
+                <input class="uk-input" type="text" name="name" placeholder="Имя" value="<%= user.name %>">
+            </div>
+
+            <div class="uk-margin">
+                <input class="uk-input" type="text" name="email" placeholder="Email" value="<%= user.email %>">
+            </div>
+
+            <button type="button" onclick="updateUser(<%= user.id%>)" class="uk-button uk-button-default">Редактироавать</button>
+        </fieldset>
+    </form>
+    <a class="uk-button uk-button-default" href='http://localhost:5000/auth/logout'>Выйти</a>
+    </div>
+    <h3 class="uk-margin-large-top">Твои промокоды:</h3>
+    <div class="uk-text-center uk-child-width-1-2@s uk-child-width-1-5@m" uk-grid>
+        <% const promocodes = user.promocodes %>
+        <% if (promocodes && promocodes.length) { %>
+            <% for (var i = 0; i < promocodes.length; i++) { %>
+                <% const promocode = promocodes[i]; %>
+                <div>
+                    <div class="uk-card uk-card-default uk-card-body uk-card-hover">
+                        <a onclick='deletePromocode(<%=promocode.id%>)' class="uk-icon-link uk-position-right uk-padding-small" uk-icon="trash"></a>
+                        <h3 class="uk-card-title"><%= promocode.productName %></h3>
+                        <p><%= promocode.description %></p>
+                        <p><%= `${promocode.saleSize}%` %></p>
+                        <a href="<%= promocode.productUrl %>"> <%= promocode.productUrl %> </a>
+                        <h4><%= promocode.code %></h4>
+                    </div>
+                </div>
+            <%}%>
+        <%} else {%>
+            <p>У вас нет созданных промокодов</p>
+        <% } %>
+    </div>
+</main>
+<script>
+    function deletePromocode(id) {
+      fetch(`http://localhost:5000/promocodes/${id}`, {
+        method: 'DELETE'
+      });
+
+      location.reload();
+    }
+
+    function updateUser(id) {
+      const form = document.updateUserForm;
+
+      const name = form.name.value;
+      const email = form.email.value;
+      console.log(name, email);
+      fetch(`http://localhost:5000/users/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          name,
+          email,
+        })
+      }).then(data => data);
+
+    }
+</script>
+</body>
+</html>

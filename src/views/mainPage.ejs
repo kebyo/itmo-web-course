@@ -26,11 +26,13 @@
                     <li class="uk-activate"><a href="http://localhost:5000/promocodes/create" class="uk-icon-link" uk-icon="plus-circle"></a></li>
                 </ul>
             </div>
-            <div class="uk-navbar-right">
-                <ul class="uk-navbar-nav">
-                    <li class="uk-activate"><a href="http://localhost:5000/auth/login" class="uk-icon-link" uk-icon="user"></a></li>
-                </ul>
-            </div>
+            <% if (isAuth) { %>
+                <div class="uk-navbar-right">
+                    <ul class="uk-navbar-nav">
+                        <li class="uk-activate"><a href="http://localhost:5000/users" class="uk-icon-link" uk-icon="user"></a></li>
+                    </ul>
+                </div>
+            <% } %>
         </nav>
     </header>
 
@@ -41,7 +43,6 @@
                     <% const promocode = promocodes[i]; %>
                     <div>
                         <div class="uk-card uk-card-default uk-card-body uk-card-hover">
-                            <a href="http://localhost:5000/promocodes/update/1" class="uk-icon-link uk-position-right uk-padding-small" uk-icon="pencil"></a>
                             <h3 class="uk-card-title"><%= promocode.productName %></h3>
                             <p><%= promocode.description %></p>
                             <p><%= `${promocode.saleSize}%` %></p>
@@ -54,44 +55,5 @@
         </div>
 
     </main>
-
-    <script>
-        async function createPromocode() {
-            const productName = document.pomocode_create_input.productName.value;
-            const productUrl = document.pomocode_create_input.productUrl.value;
-            const saleSize = document.pomocode_create_input.saleSize.value;
-            const description = document.pomocode_create_input.description.value;
-            console.log({
-                productName,
-                productUrl,
-                saleSize,
-                description
-            },)
-
-            await fetch('http://localhost:5000/promocodes', {
-                method: 'POST',
-                body: {
-                    productName,
-                    productUrl,
-                    saleSize,
-                    description
-                },
-            }).catch(e => {
-                console.log(e);
-                if (e.code === 401) {
-                    console.log('Unauthorized');
-                }
-            });
-        }
-
-        function showAuthInput() {
-
-        }
-
-        function login() {
-
-        }
-
-    </script>
 </body>
 </html>
