@@ -7,7 +7,8 @@ import { join } from 'path';
 import { AppModule } from './app/app.module';
 import { appHost, appPort } from './config/environment';
 import * as cookieParser from 'cookie-parser';
-import session from 'express-session';
+import * as session from 'express-session';
+import * as passport from 'passport';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -21,8 +22,13 @@ async function bootstrap() {
       secret: 'my-secret',
       resave: false,
       saveUninitialized: false,
+      cookie: {
+        maxAge: 604_800_000,
+      }
     }),
   );
+  app.use(passport.initialize());
+  app.use(passport.session());
 
   // Активируем рендеринг ejs шаблонов
   app.setBaseViewsDir([join(process.cwd(), 'src/views')]);
