@@ -1,36 +1,32 @@
 import {
   BadRequestException,
   Body,
+  ClassSerializerInterceptor,
   Controller,
-  HttpCode,
-  Patch,
-  Post,
-  Res,
   Get,
-  Render,
+  Patch,
+  Post, Redirect,
+  Render, Req, Res, Session, UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import {
-  ApiOkResponse,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import { Response } from 'express';
+import { ApiTags } from '@nestjs/swagger';
 
-import { UserService } from '../../user/database/user.service';
+import { UserService } from '../../user/rest/user.service';
 import { AuthCommonService } from '../common/authCommon.service';
-import { UserTokensService } from '../database/userTokens.service';
 import { AuthResponseDto } from '../dtos/auth-response.dto';
-import { ForbiddenResponseDto } from '../dtos/forbidden-response.dto';
 import { RefreshTokenDto } from '../dtos/refresh-token.dto';
 import { LoginDto, SignUpDto } from './auth.dtos';
+import { CurrentUser } from '../common/currentUser.decorator';
+import { User } from '../../user/database/user.entity';
+import { LoginGuard } from '../common/login.guard';
+import { Request, Response } from 'express';
+import { CookieAuthenticationGuard } from '../common/coockieAuth.guard';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly userService: UserService,
-    private readonly userTokensService: UserTokensService,
     private readonly authCommonService: AuthCommonService,
   ) {}
 
@@ -45,41 +41,29 @@ export class AuthController {
   async signupPage() {
     return;
   }
+
   /**
    * Выполняет аутентификацию с использованием email/phone и пароля
    */
   @Post('login')
+  @UseInterceptors(ClassSerializerInterceptor)
+  @UseGuards(LoginGuard)
+  @Redirect('/')
   async login(
     @Body() body: LoginDto,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<AuthResponseDto> {
+    @CurrentUser() user: User,
+  ) {
     const { email, password } = body;
 
-    const user = await this.userService.checkUserCredentials(email, password);
+    // return this.userService.checkUserCredentials(email, password);
 
-    const authResponse = await this.authCommonService.generateResponse(user);
-    res.cookie('token', authResponse.accessToken);
-
-    return authResponse;
+    return user;
   }
 
-  // /**
-  //  * Выполняет аутентификацию с использованием email/phone и пароля
-  //  */
-  // @ApiOperation({
-  //   summary: 'Login into application',
-  // })
-  // @ApiOkResponse({
-  //   description: 'Login into application',
-  //   type: AuthResponseDto,
-  // })
-  // @ApiResponse({
-  //   status: 401,
-  //   type: ForbiddenResponseDto,
-  // })
-  // @HttpCode(200)
   @Post('signup')
-  async signup(@Body() body: SignUpDto): Promise<AuthResponseDto> {
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Redirect('login')
+  async signup(@Body() body: SignUpDto) {
     const { email } = body;
 
     const potentialUser = await this.userService.getByEmail(email);
@@ -90,35 +74,14 @@ export class AuthController {
       );
     }
 
-    const user = await this.userService.createUser(body);
-
-    return this.authCommonService.generateResponse(user);
+    return this.userService.createUser(body);
   }
 
-  // /**
-  //  * Позволяет получить новый токен по refresh-токену
-  //  */
-  // @ApiOperation({
-  //   summary: 'Get updated access token by refresh token',
-  // })
-  // @ApiOkResponse({
-  //   description: 'Got updated access token',
-  //   type: AuthResponseDto,
-  // })
-  // @ApiResponse({
-  //   status: 401,
-  //   type: ForbiddenResponseDto,
-  // })
-  // @ApiOkResponse({
-  //   description: 'Refresh token',
-  //   type: String,
-  // })
-  @Patch('refresh')
-  async useRefreshToken(
-    @Body() body: RefreshTokenDto,
-  ): Promise<AuthResponseDto> {
-    const user = await this.userTokensService.useAuthToken(body.token);
-
-    return this.authCommonService.generateResponse(user);
+  @UseGuards(CookieAuthenticationGuard)
+  @Get('logout')
+  @Redirect('/')
+  async logout(@Req() req: Request) {
+    // req.logOut();
+    req.session.cookie.maxAge = 0;
   }
 }
