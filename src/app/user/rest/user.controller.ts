@@ -1,50 +1,41 @@
 import {
-  Body,
+  Body, ClassSerializerInterceptor,
   Controller, Delete,
   Get,
   HttpCode,
-  HttpException,
-  HttpStatus,
   Param, Patch,
-  Post,
-  Put,
-  Req,
+  Render,
   Res,
-  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiConsumes,
+  ApiBearerAuth, ApiCookieAuth,
   ApiOperation,
-  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 
 import { User } from '../database/user.entity';
-import { UserService } from '../database/user.service';
-import { RegisterUserInvalidCredentials } from '../dtos/register-user-invalid-credentials';
+import { UserService } from './user.service';
 import { SqlValidationErrorDto } from '../dtos/sql-validation-error.dto';
 import { ValidationErrorDto } from '../dtos/validation-error.dto';
-import {JwtAuthGuard} from '../../auth/common/jwt-auth.guard';
 import {UserDto,  UserUpdateDto} from './user.dtos';
 import {CurrentUser} from '../../auth/common/currentUser.decorator';
 import {AuthResponseDto} from '../../auth/dtos/auth-response.dto';
+import { Response } from 'express';
+import { CookieAuthenticationGuard } from '../../auth/common/cookieAuthentication.guard';
 
 @ApiTags('users')
 @Controller('users')
-@UseGuards(JwtAuthGuard)
+@UseInterceptors(ClassSerializerInterceptor)
+@UseGuards(CookieAuthenticationGuard)
 export class UserController {
   constructor(
     private readonly userService: UserService,
   ) {}
 
+  @ApiCookieAuth()
   @ApiOperation({
     summary: 'Update user fields',
   })
@@ -65,11 +56,25 @@ export class UserController {
   })
   @HttpCode(200)
   @Patch()
-  async update(@Body() userDto: UserUpdateDto, @CurrentUser() user) {
-    return this.userService.updateUser(user.id, userDto);
+  async update(@Body() updateDto: UserUpdateDto, @CurrentUser() user) {
+    return this.userService.updateUser(user.id, updateDto);
   }
 
-  @ApiBearerAuth()
+  @ApiCookieAuth()
+  @ApiOperation({
+    summary: 'Delete user',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully deleted user',
+    type: AuthResponseDto,
+  })
+  @ApiResponse({
+    status: 422,
+    description: 'SQL error',
+    type: SqlValidationErrorDto,
+  })
+  @HttpCode(200)
   @Delete()
   async delete(@CurrentUser() user: User) {
     return this.userService.delete(user.id);
@@ -83,7 +88,16 @@ export class UserController {
 
   @ApiBearerAuth()
   @Get()
-  async getAll(@Param('id') id: number) {
-    return this.userService.getAll();
+  @Render('account')
+  async getAll(@CurrentUser() currentUser: User, @Res() res: Response) {
+    if (!currentUser) {
+      res.redirect('/auth/login');
+    }
+
+    const user = await this.userService.getByIdOrFail(currentUser.id, ['promocodes']);
+
+    return {
+      user,
+    }
   }
 }

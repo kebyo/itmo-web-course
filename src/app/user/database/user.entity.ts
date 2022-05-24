@@ -9,7 +9,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { UserAuthToken } from '../../auth/database/userAuthToken.entity';
 import {UserFields} from '../common/user.fields';
 import {Promocode} from '../../promocode/database/promocode.entity';
 
@@ -35,9 +34,6 @@ export class User extends UserFields {
     length: 255,
   })
   password_hash: string;
-
-  @OneToMany(() => UserAuthToken, (token) => token.user)
-  authTokens: UserAuthToken[];
 
   @OneToMany(() => Promocode, (promocode) => promocode.owner)
   promocodes: Promocode[];

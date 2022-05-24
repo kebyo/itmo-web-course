@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import {FindConditions, Repository} from 'typeorm';
 
 import { applyChanges } from '../../../utils/object';
-import { User } from './user.entity';
-import {UserUpdateDto} from '../rest/user.dtos';
+import { User } from '../database/user.entity';
+import {UserUpdateDto} from './user.dtos';
 import {isEmail, isPhoneNumber} from 'class-validator';
 import {SignUpDto} from '../../auth/rest/auth.dtos';
 import {saltRounds} from '../../../config/jwt';
@@ -47,12 +47,12 @@ export class UserService {
     return this.userRepo.findOne({ where:{email} });
   }
 
-  public async getByIdOrFail(id: number): Promise<User> {
-    return this.userRepo.findOneOrFail({where:{id}});
+  public async getByIdOrFail(id: number, relations?: string[]): Promise<User> {
+    return this.userRepo.findOneOrFail({where:{id}, relations});
   }
 
   public async getById(id: number): Promise<User | null> {
-    return this.userRepo.findOne({where:{id}});
+    return this.userRepo.findOne(id);
   }
 
   public async delete(id: number): Promise<boolean> {

@@ -8,7 +8,7 @@ export class PromocodeDto extends PromocodeFields {}
 
 export class PromocodeCreateDto extends PromocodeCommonFields {}
 
-export class PromocodeUpdate extends PartialType(PromocodeCommonFields) {}
+export class PromocodeUpdateDto extends PartialType(PromocodeCommonFields) {}
 
 export class PromocodeDeleteDto {
 	success: boolean;
