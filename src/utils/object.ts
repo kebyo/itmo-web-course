@@ -1,25 +1,5 @@
 import { castArray as _castArray, isNil } from 'lodash';
 
-export interface AnyObject {
-  [key: string]: any;
-}
-
-/**
- * Если какой-то ключ объекта target равен null или undefined,
- * то применяется значение соответствующего ключа из defaults.
- * Мутирует объект target
- *
- * @param target - целевой объект
- * @param defaults - значения по умолчанию
- */
-export function applyDefaults<T>(target: T, defaults: Partial<T>): void {
-  for (const key of Object.keys(defaults)) {
-    if (isNil(target[key])) {
-      target[key] = defaults[key];
-    }
-  }
-}
-
 /**
  * Применяет изменения из changes в target (мутирует target)
  *
