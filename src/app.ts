@@ -9,6 +9,7 @@ import { appHost, appPort } from './config/environment';
 import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
 import * as passport from 'passport';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -30,6 +31,10 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
 
+  const config = new DocumentBuilder().build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, document);
+
   // Активируем рендеринг ejs шаблонов
   app.setBaseViewsDir([join(process.cwd(), 'src/views')]);
   app.setViewEngine('ejs');
@@ -37,4 +42,8 @@ async function bootstrap() {
   await app.listen(appPort, appHost);
 }
 
+/**
+ * @todo деплой
+ * @todo Новый продукт появился WS
+ */
 bootstrap().catch((e) => console.error(`Uncaught error`, e));
