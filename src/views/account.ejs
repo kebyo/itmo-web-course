@@ -18,8 +18,8 @@
     <nav class="uk-navbar-container" uk-navbar style="margin-bottom: 10px">
         <div class="uk-navbar-left">
             <ul class="uk-navbar-nav">
-                <li class="uk-active"><a href="https://promcoode-api.herokuapp.com">Главная</a></li>
-                <li class="uk-activate"><a href="https://promcoode-api.herokuapp.com/promocodes/create" class="uk-icon-link" uk-icon="plus-circle"></a></li>
+                <li class="uk-active"><a href="http://localhost:5000">Главная</a></li>
+                <li class="uk-activate"><a href="http://localhost:5000/promocodes/create" class="uk-icon-link" uk-icon="plus-circle"></a></li>
             </ul>
         </div>
     </nav>
@@ -41,7 +41,7 @@
             <button type="button" onclick="updateUser(<%= user.id%>)" class="uk-button uk-button-default">Редактироавать</button>
         </fieldset>
     </form>
-    <a class="uk-button uk-button-default" href='https://promcoode-api.herokuapp.com/auth/logout'>Выйти</a>
+    <a class="uk-button uk-button-default" href='http://localhost:5000/auth/logout'>Выйти</a>
     </div>
     <h3 class="uk-margin-large-top">Твои промокоды:</h3>
     <div class="uk-text-center uk-child-width-1-2@s uk-child-width-1-5@m" uk-grid>
@@ -67,7 +67,7 @@
 </main>
 <script>
     function deletePromocode(id) {
-      fetch(`https://promcoode-api.herokuapp.com/promocodes/${id}`, {
+      fetch(`http://localhost:5000/promocodes/${id}`, {
         method: 'DELETE'
       });
 
@@ -80,7 +80,7 @@
       const name = form.name.value;
       const email = form.email.value;
       console.log(name, email);
-      fetch(`https://promcoode-api.herokuapp.com/users/${id}`, {
+      fetch(`http://localhost:5000/users/${id}`, {
         method: 'PATCH',
         body: JSON.stringify({
           name,
