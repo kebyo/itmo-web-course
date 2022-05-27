@@ -11,6 +11,7 @@
     <!-- UIkit JS -->
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.14.1/dist/js/uikit.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.14.1/dist/js/uikit-icons.min.js"></script>
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
     <title>Главная</title>
 </head>
 <body>
@@ -35,6 +36,7 @@
             <% } %>
         </nav>
     </header>
+    <button class="uk-button uk-button-default demo" type="button" onclick="">With icon</button>
 
     <main>
         <div class="uk-text-center uk-child-width-1-2@s uk-child-width-1-5@m" uk-grid>
@@ -56,4 +58,17 @@
 
     </main>
 </body>
+<script>
+  const socket = io("ws://localhost:5000");
+
+  socket.onopen(e =>{
+    console.log('Connected');
+
+    socket.on('msgToClient', (message) => {
+      UIkit.notification({message: '<span uk-icon=\'icon: check\'></span> Message with an icon'})
+    });
+  });
+
+  socket.onclose(e => console.log('Closed'))
+</script>
 </html>

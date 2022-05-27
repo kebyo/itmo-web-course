@@ -11,6 +11,7 @@
     <!-- UIkit JS -->
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.14.1/dist/js/uikit.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.14.1/dist/js/uikit-icons.min.js"></script>
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
     <title>Создание промокода</title>
 </head>
 <body>
@@ -49,10 +50,23 @@
                 <div class="uk-margin">
                     <textarea class="uk-textarea" rows="5" name="description" placeholder="Описание скидки"></textarea>
                 </div>
-                <button type="submit" class="uk-button uk-button-default">Создать</button>
+                <button type="submit" class="uk-button uk-button-default" onclick='onClick()'>Создать</button>
             </fieldset>
         </form>
     </div>
 </main>
+<script>
+    function onClick() {
+        const socket = io("ws://localhost:5000");
+
+        socket.onopen(e =>{
+            console.log('Connected');
+
+          socket.emit('msgToServer', {});
+        });
+
+        socket.onclose(e => console.log('Closed'))
+    }
+</script>
 </body>
 </html>
