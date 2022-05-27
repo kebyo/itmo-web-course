@@ -1,6 +1,6 @@
 import { Column } from 'typeorm';
 import {ApiProperty} from '@nestjs/swagger';
-import {IsEmail, IsNotEmpty, IsPhoneNumber, IsString} from 'class-validator';
+import {IsEmail, IsNotEmpty, IsString} from 'class-validator';
 
 
 export class UserCommonFields {
