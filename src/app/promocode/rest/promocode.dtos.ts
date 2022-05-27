@@ -3,7 +3,6 @@ import {Exclude} from 'class-transformer';
 import {PromocodeFields} from '../common/promocode.fields';
 import {PartialType} from '@nestjs/mapped-types';
 
-@Exclude()
 export class PromocodeDto extends PromocodeFields {}
 
 export class PromocodeCreateDto extends PromocodeCommonFields {}

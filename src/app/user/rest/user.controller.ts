@@ -18,9 +18,7 @@ import {
 
 import { User } from '../database/user.entity';
 import { UserService } from './user.service';
-import { SqlValidationErrorDto } from '../dtos/sql-validation-error.dto';
-import { ValidationErrorDto } from '../dtos/validation-error.dto';
-import {UserDto,  UserUpdateDto} from './user.dtos';
+import { UserDto, UserUpdateDto, ValidationErrorDto } from './user.dtos';
 import {CurrentUser} from '../../auth/common/currentUser.decorator';
 import {AuthResponseDto} from '../../auth/dtos/auth-response.dto';
 import { Response } from 'express';
@@ -47,12 +45,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'Successfully updated user',
-    type: AuthResponseDto,
-  })
-  @ApiResponse({
-    status: 422,
-    description: 'SQL error',
-    type: SqlValidationErrorDto,
+    type: UserDto,
   })
   @HttpCode(200)
   @Patch()
@@ -67,12 +60,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'Successfully deleted user',
-    type: AuthResponseDto,
-  })
-  @ApiResponse({
-    status: 422,
-    description: 'SQL error',
-    type: SqlValidationErrorDto,
+    type: Boolean,
   })
   @HttpCode(200)
   @Delete()
@@ -80,13 +68,6 @@ export class UserController {
     return this.userService.delete(user.id);
   }
 
-  @ApiBearerAuth()
-  @Get('/:id')
-  async getById(@Param('id') id: number): Promise<UserDto> {
-    return this.userService.getByIdOrFail(id);
-  }
-
-  @ApiBearerAuth()
   @Get()
   @Render('account')
   async getAll(@CurrentUser() currentUser: User, @Res() res: Response) {

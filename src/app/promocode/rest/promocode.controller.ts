@@ -3,7 +3,7 @@ import {
   Controller,
   Delete,
   ForbiddenException,
-  Get, Logger,
+  Get, HttpCode, Logger,
   Param,
   Patch,
   Post, Redirect,
@@ -15,7 +15,7 @@ import { Promocode } from '../database/promocode.entity';
 import { Repository } from 'typeorm';
 import {
   PromocodeCreateDto,
-  PromocodeDeleteDto, PromocodeUpdateDto,
+  PromocodeDeleteDto, PromocodeDto, PromocodeUpdateDto,
 } from './promocode.dtos';
 import { CurrentUser } from '../../auth/common/currentUser.decorator';
 import { User } from '../../user/database/user.entity';
@@ -23,12 +23,16 @@ import { applyChanges } from '../../../utils/object';
 import { LoginGuard } from '../../auth/common/login.guard';
 import { CookieAuthenticationGuard } from '../../auth/common/cookieAuthentication.guard';
 import { PromocodeService } from './promocode.service';
+import { ApiCookieAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ValidationErrorDto } from '../../user/rest/user.dtos';
+import { PromocodeGateway } from '../ws/promocode.gateway';
 
 @Controller('promocodes')
 @UseInterceptors(ClassSerializerInterceptor)
 export class PromocodeController {
   constructor(
     private readonly promocodeService: PromocodeService,
+    private readonly promocodeGateway: PromocodeGateway,
   ) {}
 
   @Get()
@@ -60,16 +64,45 @@ export class PromocodeController {
     return;
   }
 
-  @Post()
+  @ApiCookieAuth()
+  @ApiOperation({
+    summary: 'Create promocode',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully created promocode',
+    type: PromocodeDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Validation Error',
+    type: ValidationErrorDto,
+  })
+  @HttpCode(200)
   @UseGuards(CookieAuthenticationGuard)
   @Redirect('/')
+  @Post()
   async create(
     @Body() body: PromocodeCreateDto,
     @CurrentUser() user: User,
   ): Promise<Promocode> {
-    return this.promocodeService.create(user, body);
+    const promocode = await this.promocodeService.create(user, body);
+
+    this.promocodeGateway.server.emit('msgToClient', JSON.stringify(promocode));
+
+    return promocode;
   }
 
+  @ApiCookieAuth()
+  @ApiOperation({
+    summary: 'Delete promocode',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully deleted promocode',
+    type: Boolean,
+  })
+  @HttpCode(200)
   @Delete(':id')
   async delete(
     @Param('id') id: number,
@@ -82,6 +115,21 @@ export class PromocodeController {
     };
   }
 
+  @ApiCookieAuth()
+  @ApiOperation({
+    summary: 'Update promocode',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully updated promocode',
+    type: PromocodeDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Validation Error',
+    type: ValidationErrorDto,
+  })
+  @HttpCode(200)
   @Patch('/:id')
   async update(
     @Param('id') id: number,
