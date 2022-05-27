@@ -18,18 +18,20 @@ console.log(
 );
 
 export const ormConfig: TypeOrmModuleOptions = {
+  url: 'postgres://wwipvhydqrznjf:c651484b7b0f245d2d5fbcabfef4aee1735f50523dc87724178461679b2de96c@ec2-34-230-153-41.compute-1.amazonaws.com:5432/d4ng003d76qfc7',
   type: 'postgres',
-  host: typeormHost,
-  port: typeormPort,
-  username: typeormUser,
-  password: typeormPassword,
-  database: typeormDatabase,
+  // host: typeormHost,
+  // port: typeormPort,
+  // username: typeormUser,
+  // password: typeormPassword,
+  // database: typeormDatabase,
   entities: [`${typeormBaseDirectory}/**/*.entity{.ts,.js}`],
   migrationsTableName: 'typeorm_migrations',
   migrations: [`${typeormBaseDirectory}/migrations/*{.ts,.js}`],
   cli: {
     migrationsDir: `${typeormBaseDirectory}/migrations`,
   },
+  ssl: true,
   logging: booleanEnv(process.env.DEBUG_SQL),
 };
 
